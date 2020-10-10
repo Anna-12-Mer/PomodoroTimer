@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
+import 'dart:math' as math;
+import 'package:flutter/rendering.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,8 +15,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pomodro',
       theme: ThemeData(
+        canvasColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.white),
         primarySwatch: Colors.red,
-        accentColor: Colors.purple,
+        accentColor: Colors.pinkAccent,
         fontFamily: 'Quicksand',
         textTheme: ThemeData.light().textTheme.copyWith(
               title: TextStyle(
@@ -39,114 +45,161 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  Timer _timer;
-  int _start = 25;
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  AnimationController controller;
+  String get timerString {
+    Duration duration = controller.duration * controller.value;
+    return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+  }
 
-  void _startTime() {
-    const oneSec = const Duration(minutes: 1);
-    _timer = Timer.periodic(
-      oneSec,
-      (timer) {
-        setState(
-          () {
-            if (_start < 1) {
-              timer.cancel();
-            } else {
-              _start--;
-            }
-          },
-        );
-      },
-    );
+  Future<AudioPlayer> playLocalAsset() async {
+    AudioCache cache = new AudioCache();
+    return await cache.play('assets/mp3/alert_timer_end.mp3');
   }
 
   @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 5),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pomodro Timer'),
+        title: Text('Pomodoro Timer'),
       ),
-      body: SingleChildScrollView(
-        child: Card(
-          color: Colors.red,
-          elevation: 6,
-          margin: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(50),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      '25:00',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25),
-                    ),
-                  ],
+      body: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Align(
+                alignment: FractionalOffset.center,
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned.fill(
+                        child: AnimatedBuilder(
+                            animation: controller,
+                            builder: (BuildContext context, Widget child) {
+                              return new CustomPaint(
+                                painter: TimerPainter(
+                                    animation: controller,
+                                    backgroudColor: Colors.white,
+                                    color: Theme.of(context).indicatorColor),
+                              );
+                            }),
+                      ),
+                      Align(
+                        alignment: FractionalOffset.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.all(5),
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: NetworkImage(
+                                            'https://cdn.pixabay.com/photo/2012/04/18/14/37/tomato-37219_1280.png'),
+                                        fit: BoxFit.fill),
+                                  ),
+                                ),
+                                Text(
+                                  "Pomodoro",
+                                  style: Theme.of(context).textTheme.title,
+                                ),
+                              ],
+                            ),
+                            AnimatedBuilder(
+                                animation: controller,
+                                builder: (BuildContext context, Widget child) {
+                                  return new Text(
+                                    timerString,
+                                    style: Theme.of(context).textTheme.display4,
+                                  );
+                                })
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            Container(
+              margin: EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  // Start Button
-                  RaisedButton(
-                    onPressed: () => _start,
-                    textColor: Colors.white,
-                    color: Theme.of(context).accentColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Start'),
-                        Padding(
-                          padding: EdgeInsets.only(right: 10),
-                        ),
-                        Icon(Icons.access_time)
-                      ],
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(right: 10)),
-                  // Reset Button
-                  RaisedButton(
-                    onPressed: () => _start,
-                    textColor: Colors.white,
-                    color: Theme.of(context).accentColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Reset'),
-                        Padding(padding: EdgeInsets.only(right: 10)),
-                        Icon(Icons.refresh),
-                      ],
-                    ),
-                  ),
+                  FloatingActionButton(
+                    child: AnimatedBuilder(
+                        animation: controller,
+                        builder: (BuildContext context, Widget child) {
+                          return new Icon(controller.isAnimating
+                              ? Icons.pause
+                              : Icons.play_arrow);
+                        }),
+                    onPressed: () {
+                      setState(() {
+                        if (controller.isAnimating)
+                          controller.stop();
+                        else {
+                          controller.reverse(
+                              from: controller.value == 0.0
+                                  ? 1.0
+                                  : controller.value);
+                        }
+                      });
+                    },
+                  )
                 ],
               ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
     );
+  }
+}
+
+class TimerPainter extends CustomPainter {
+  final Animation<double> animation;
+  final Color backgroudColor, color;
+
+  TimerPainter({
+    this.animation,
+    this.backgroudColor,
+    this.color,
+  }) : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = backgroudColor
+      ..strokeWidth = 5.0
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    canvas.drawCircle(size.center(Offset.zero), size.width / 2.0, paint);
+    paint.color = color;
+    double progress = (1.0 - animation.value) * 2 * math.pi;
+    canvas.drawArc(Offset.zero & size, math.pi * 1.5, -progress, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(TimerPainter old) {
+    return animation.value != old.animation.value || color != old.color;
   }
 }
