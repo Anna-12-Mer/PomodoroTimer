@@ -1,48 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import './timer_main.dart';
 
 class WelcomePage extends StatelessWidget {
+  void goTopomodoro(BuildContext context) {
+    Navigator.of(context).pushNamed(TimerMain.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome To POMODORO Timer!'),
+        title: Text('Welcome!'),
       ),
       body: Container(
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage("assets/img/pomodoro_timer.png"),
-              fit: BoxFit.cover),
+              fit: BoxFit.none),
         ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+        child: Container(
+          margin: EdgeInsets.all(6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                width: 20.0,
-                height: 100.0,
+                height: 50,
               ),
-              Text(
-                "Be",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 43.0,
-                    fontFamily: 'OpenSans',
-                    fontWeight: FontWeight.bold),
+              Center(
+                child: Text(
+                  "I Know you have a lot of work, but I promise to help you CATCH UP. ",
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 20.0,
+                      fontFamily: 'OpenSans',
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
               ),
               SizedBox(
-                width: 20.0,
-                height: 100.0,
+                height: 400,
               ),
-              RotateAnimatedTextKit(
-                  onTap: () {
-                    print('Tap Event');
-                  },
-                  text: ["Productive", "Focused", "Smarter"],
-                  textStyle: TextStyle(fontSize: 40.0, fontFamily: "Horizon"),
-                  textAlign: TextAlign.start)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    height: 6,
+                  ),
+                  InkWell(
+                    onTap: () => goTopomodoro(context),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Text(
+                          'Go',
+                          style: TextStyle(
+                            fontSize: 40,
+                            // fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Icon(
+                          Icons.navigate_next,
+                          color: Colors.red,
+                          size: 50,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

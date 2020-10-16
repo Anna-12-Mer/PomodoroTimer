@@ -3,7 +3,7 @@ import './models/timer_painter.dart';
 
 
 class TimerMain extends StatefulWidget {
-  TimerMain({Key key}) : super(key: key);
+  static const routeName = '/timer';
 
   @override
   _TimerMainState createState() => _TimerMainState();

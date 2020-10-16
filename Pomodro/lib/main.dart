@@ -2,6 +2,11 @@ import './welcome_page_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import 'timer_main.dart';
+import 'timer_main.dart';
+import 'welcome_page_screen.dart';
+import 'welcome_page_screen.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -15,7 +20,7 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
         iconTheme: IconThemeData(color: Colors.white),
         primarySwatch: Colors.red,
-        accentColor: Colors.pinkAccent,
+        accentColor: Colors.redAccent,
         fontFamily: 'Quicksand',
         textTheme: ThemeData.light().textTheme.copyWith(
               title: TextStyle(
@@ -32,7 +37,15 @@ class MyApp extends StatelessWidget {
               ),
         ),
       ),
-      home: WelcomePage(),
+      // home: WelcomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (ctx) => WelcomePage(),
+        TimerMain.routeName: (ctx) => TimerMain(),
+      },
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(builder: (ctx) => WelcomePage());
+      },
     );
   }
 }
