@@ -1,11 +1,10 @@
+import './steps_pomodoro_screen.dart';
+
 import './welcome_page_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'timer_main.dart';
-import 'timer_main.dart';
-import 'welcome_page_screen.dart';
-import 'welcome_page_screen.dart';
+import './timer_main.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,6 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (ctx) => WelcomePage(),
         TimerMain.routeName: (ctx) => TimerMain(),
+        StepsPopodoro.routeName: (ctx) => StepsPopodoro()
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(builder: (ctx) => WelcomePage());
