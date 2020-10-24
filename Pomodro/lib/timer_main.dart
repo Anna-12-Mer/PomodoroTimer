@@ -22,7 +22,7 @@ class _TimerMainState extends State<TimerMain> with TickerProviderStateMixin {
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5),
+      duration: Duration(minutes: 25),
     );
   }
 

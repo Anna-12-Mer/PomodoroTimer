@@ -1,6 +1,6 @@
 import './steps_pomodoro_screen.dart';
 import 'package:flutter/material.dart';
-import './timer_main.dart';
+
 
 class WelcomePage extends StatelessWidget {
   void goTopomodoro(BuildContext context) {
